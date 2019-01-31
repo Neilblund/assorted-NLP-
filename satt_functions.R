@@ -35,7 +35,7 @@ wordFrex<-function(model){
   
   wfr<-lapply(rownames(frex), function(x){
     list("words"=sort(setNames(object=frex[x, ], colnames(frex)), decreasing=T),
-         "authors"=sort(setNames(result$theta[,as.numeric(x)], rownames(result$theta)), decreasing=T),
+         "authors"=sort(setNames(model$result$theta[,as.numeric(x)], rownames(model$result$theta)), decreasing=T),
          "documents"=sort(setNames(tops[as.numeric(x),], colnames(tops)), decreasing=T)
     )
   })
