@@ -16,7 +16,7 @@ authorFrex<-function(model){
   
 }
 
-topicInfo<-function(model){
+wordFrex<-function(model){
   ctv<-model$replicate$CTV+.01
   frex<-matrix(NA, nrow=nrow(ctv), ncol=ncol(ctv), 
                dimnames = list(rownames=seq(nrow(ctv)), colnames=names(model$replicate$vocab))
@@ -65,11 +65,24 @@ authorWords<-function(model, weight=F){
   return(afreq)
 }
 
-authorInfluence<-function(model, level='country'){
+
+
+authorInfluence<-function(model, level='country', weight=TRUE, removeGenerics=TRUE){
   Psi<-model$result$psi
+  
+  if(removeGenerics==TRUE & "GENERIC"%in%colnames(Psi)){
+    Psi<-Psi[,which(colnames(Psi)!="GENERIC")]
+  }
+  
+  
   bestauthors<-lapply(seq(nrow(Psi)), function(x){
     authors<-Psi[x,which(Psi[x,]>0)]
-    return(authors - (1/length(authors)))
+    authors<-authors/sum(authors)
+    if(weight==TRUE){
+      
+      authors<-authors - (1/length(authors))
+    }
+    return(authors)
     
   })
   best<-unlist(bestauthors)
@@ -85,5 +98,4 @@ authorInfluence<-function(model, level='country'){
   }
   return(best)
 }
-
 
