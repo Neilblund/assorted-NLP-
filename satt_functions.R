@@ -16,7 +16,7 @@ authorFrex<-function(model){
   
 }
 
-wordFrex<-function(model){
+topicInfo<-function(model){
   ctv<-model$replicate$CTV+.01
   frex<-matrix(NA, nrow=nrow(ctv), ncol=ncol(ctv), 
                dimnames = list(rownames=seq(nrow(ctv)), colnames=names(model$replicate$vocab))
