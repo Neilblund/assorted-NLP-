@@ -99,3 +99,39 @@ authorInfluence<-function(model, level='country', weight=TRUE, removeGenerics=TR
   return(best)
 }
 
+                  
+#FUNCTIONS
+
+topicDistance<-function(model, level="agreement"){
+  JSdist<-function(p, q){
+    m <- 0.5 * (p + q)
+    return(0.5 * (sum(p * log(p / m)) + sum(q * log(q / m))))
+  }
+  theta<-model$result$theta
+  alpha<-model$alpha_trained
+  topicmat<-sapply(model$replicate$topics, function(x) table(factor(x, levels=seq(ncol(theta)))))
+  topicmat<-t(apply(topicmat, 2, FUN=function(x) (x+alpha)/sum(x+alpha)))
+  
+  dmat<-list()
+  for(i in 1:nrow(topicmat)){
+    authors<-model$replicate$authorlist[[i]]+1
+    q<-topicmat[i,]
+      jdist<-apply(theta[authors,], 1, FUN=function(x) JSdist(x, q))
+
+    
+    dmat[[i]]<-data.frame("agreement"=rep(model$replicate$docnames[[i]], length(jdist)),
+                      "country"= names(jdist),
+                      "js_distance"=unname(jdist)
+    )
+    
+
+  }
+  dmat<-do.call('rbind', dmat)
+  if(level=="country"){
+    dmat<-aggregate.data.frame(dmat$js_distance, by=list(dmat$country), FUN=mean)
+    colnames(dmat)<-c('country', "js_distance")
+    
+  }
+  return(dmat)
+
+}
